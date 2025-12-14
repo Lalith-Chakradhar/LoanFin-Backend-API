@@ -4,5 +4,5 @@ import loanfin.dto.LoanApplicationRequest;
 import loanfin.dto.LoanApplicationResponse;
 
 public interface BorrowerService {
-    LoanApplicationResponse applyLoanService(LoanApplicationRequest request);
+    LoanApplicationResponse applyLoanService(String borrowerId, LoanApplicationRequest request);
 }

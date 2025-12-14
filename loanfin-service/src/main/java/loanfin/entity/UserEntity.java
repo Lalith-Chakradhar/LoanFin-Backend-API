@@ -27,7 +27,10 @@ public class UserEntity extends BaseEntity{
     @Convert(converter = EncryptDecryptConverter.class)
     private String userName;
 
-    @Column(name= "email")
+    @Column(name = "email_hash", unique = true, nullable = false)
+    private String emailHash;
+
+    @Column(name = "email", nullable = false)
     @Convert(converter = EncryptDecryptConverter.class)
     private String email;
 

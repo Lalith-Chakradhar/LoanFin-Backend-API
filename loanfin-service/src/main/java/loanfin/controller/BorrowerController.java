@@ -8,7 +8,9 @@ import jakarta.validation.Valid;
 import loanfin.dto.IResponse;
 import loanfin.dto.LoanApplicationRequest;
 import loanfin.dto.LoanApplicationResponse;
+import loanfin.exception.IException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Tag(name = "Loan APIs", description = "APIs for applying, fetching all loans and particular loan of a borrower")
@@ -25,6 +27,7 @@ public interface BorrowerController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<IResponse<LoanApplicationResponse>> applyLoan(
-            @Valid @RequestBody LoanApplicationRequest request
-            );
+            @Valid @RequestBody LoanApplicationRequest request,
+            Authentication authentication
+            ) throws IException;
 }

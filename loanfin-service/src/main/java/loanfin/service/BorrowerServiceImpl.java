@@ -21,10 +21,10 @@ public class BorrowerServiceImpl implements BorrowerService{
     private final UserRepository userRepository;
 
     @Override
-    public LoanApplicationResponse applyLoanService(LoanApplicationRequest request){
+    public LoanApplicationResponse applyLoanService(String borrowerId, LoanApplicationRequest request){
 
         //Fetch borrower
-        UserEntity borrower = userRepository.findById(request.getBorrowerId()).orElseThrow(()-> new IllegalArgumentException("Borrower not found"));
+        UserEntity borrower = userRepository.findById(borrowerId).orElseThrow(()-> new IllegalArgumentException("Borrower not found"));
 
         //Role validation (CRITICAL)
         if(borrower.getRole() != UserRole.BORROWER)
