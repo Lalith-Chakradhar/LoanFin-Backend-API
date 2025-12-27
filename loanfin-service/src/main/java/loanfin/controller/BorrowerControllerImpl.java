@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,6 +29,7 @@ public class BorrowerControllerImpl implements BorrowerController {
     private final BorrowerService borrowerService;
 
     @Override
+    @PreAuthorize("hasRole('BORROWER')")
     @PostMapping(value = "/borrowers/apply-loan", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<IResponse<LoanApplicationResponse>> applyLoan(
             @Valid @RequestBody LoanApplicationRequest request,
