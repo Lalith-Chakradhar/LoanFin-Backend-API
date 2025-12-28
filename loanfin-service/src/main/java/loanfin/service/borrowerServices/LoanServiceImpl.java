@@ -1,4 +1,4 @@
-package loanfin.service;
+package loanfin.service.borrowerServices;
 
 import jakarta.transaction.Transactional;
 import loanfin.dto.LoanApplicationRequest;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class BorrowerServiceImpl implements BorrowerService{
+public class LoanServiceImpl implements LoanService {
 
     private final LoanApplicationRepository loanApplicationRepository;
     private final UserRepository userRepository;

@@ -1,4 +1,4 @@
-package loanfin.controller;
+package loanfin.controller.authenticationAPIs;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

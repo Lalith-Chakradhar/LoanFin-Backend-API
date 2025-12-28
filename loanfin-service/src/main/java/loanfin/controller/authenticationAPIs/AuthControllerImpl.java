@@ -1,10 +1,10 @@
-package loanfin.controller;
+package loanfin.controller.authenticationAPIs;
 
 import jakarta.validation.Valid;
 import loanfin.constant.ApiStatus;
 import loanfin.dto.*;
 import loanfin.exception.IException;
-import loanfin.service.AuthService;
+import loanfin.service.authenticationServices.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;

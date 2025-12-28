@@ -3,8 +3,9 @@ package loanfin.controller;
 import io.swagger.v3.oas.annotations.Hidden;
 import loanfin.entity.UserEntity;
 import loanfin.repository.UserRepository;
-import loanfin.service.PasswordService;
+import loanfin.service.authenticationServices.PasswordService;
 import loanfin.util.EmailHasher;
+import loanfin.util.NameHasher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +27,7 @@ public class HealthController {
     {
         UserEntity newUserEntity = UserEntity.builder()
                 .userName(userEntity.getUserName())
+                .nameHash(NameHasher.hash(userEntity.getUserName()))
                 .email(userEntity.getEmail())
                 .emailHash(EmailHasher.hash(userEntity.getEmail()))
                 .password(passwordService.hashPassword(userEntity.getPassword()))
