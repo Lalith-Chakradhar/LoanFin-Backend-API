@@ -1,4 +1,4 @@
-package loanfin.controller;
+package loanfin.controller.borrowerAPIs;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -14,7 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Tag(name = "Loan APIs", description = "APIs for applying, fetching all loans and particular loan of a borrower")
-public interface BorrowerController {
+public interface LoanController {
 
     @Operation(
             summary = "Apply for a loan",

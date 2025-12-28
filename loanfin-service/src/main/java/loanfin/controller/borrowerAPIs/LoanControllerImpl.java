@@ -1,4 +1,4 @@
-package loanfin.controller;
+package loanfin.controller.borrowerAPIs;
 
 import jakarta.validation.Valid;
 import loanfin.constant.ApiStatus;
@@ -6,7 +6,7 @@ import loanfin.dto.IResponse;
 import loanfin.dto.LoanApplicationRequest;
 import loanfin.dto.LoanApplicationResponse;
 import loanfin.exception.IException;
-import loanfin.service.BorrowerService;
+import loanfin.service.borrowerServices.LoanService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -24,9 +24,9 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api")
-public class BorrowerControllerImpl implements BorrowerController {
+public class LoanControllerImpl implements LoanController {
 
-    private final BorrowerService borrowerService;
+    private final LoanService loanService;
 
     @Override
     @PreAuthorize("hasRole('BORROWER')")
@@ -39,7 +39,7 @@ public class BorrowerControllerImpl implements BorrowerController {
         // 🔐 borrower identity from JWT
         String borrowerId = authentication.getName();
 
-        LoanApplicationResponse loanApplicationResponse = borrowerService.applyLoanService(borrowerId, request);
+        LoanApplicationResponse loanApplicationResponse = loanService.applyLoanService(borrowerId, request);
 
         return ResponseEntity.ok(IResponse.<LoanApplicationResponse>builder()
                 .data(loanApplicationResponse)

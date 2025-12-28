@@ -1,4 +1,4 @@
-package loanfin.service;
+package loanfin.service.authenticationServices;
 
 import loanfin.dto.LoginRequest;
 import loanfin.dto.LoginResponse;
