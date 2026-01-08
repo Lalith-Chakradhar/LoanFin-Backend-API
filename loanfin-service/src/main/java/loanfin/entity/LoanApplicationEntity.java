@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import loanfin.enums.LoanApplicationStatus;
 import lombok.*;
 
+import java.time.Instant;
+
 @Getter
 @Setter
 @Entity
@@ -14,7 +16,8 @@ import lombok.*;
         name="loan_applications",
         indexes = {
                 @Index(name = "idx_loan_borrower_id", columnList = "borrower_id"),
-                @Index(name = "idx_loan_status", columnList = "status")
+                @Index(name = "idx_loan_status", columnList = "status"),
+                @Index(name = "idx_loan_under_review_at", columnList = "under_review_at")
         }
 )
 public class LoanApplicationEntity extends BaseEntity{
@@ -56,4 +59,12 @@ public class LoanApplicationEntity extends BaseEntity{
     @Column(name = "remarks", length = 500)
     private String remarks;
 
+    @Column(name = "submitted_at", nullable = false, updatable = false)
+    private Instant submittedAt;
+
+    @Column(name = "under_review_at")
+    private Instant underReviewAt;
+
+    @Column(name = "last_status_updated_at", nullable = false)
+    private Instant lastStatusUpdatedAt;
 }

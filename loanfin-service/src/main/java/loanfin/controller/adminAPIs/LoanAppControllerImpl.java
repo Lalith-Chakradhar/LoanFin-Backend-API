@@ -3,6 +3,7 @@ package loanfin.controller.adminAPIs;
 import loanfin.constant.ApiStatus;
 import loanfin.dto.IResponse;
 import loanfin.dto.ViewAllLoanApplicationsResponse;
+import loanfin.entity.LoanApplicationEntity;
 import loanfin.enums.LoanApplicationStatus;
 import loanfin.exception.IException;
 import loanfin.service.adminServices.LoanAppService;
@@ -27,7 +28,7 @@ import java.util.List;
 public class LoanAppControllerImpl implements LoanAppController{
 
     //APIs -
-    // 1. get - / - view all loan applications - minimal loan details pertaining to filters
+    // 1. get - / - view all loan applications - minimal loan details pertaining to filters (DONE)
     // 2. get - /{loanappid} - enter into loan details and here status will be set from submitted to under_review.
     // But this admin may not use system for long time and loan application can get stuck. Should implement timeout
     // based under_review status.
@@ -44,6 +45,24 @@ public class LoanAppControllerImpl implements LoanAppController{
             LoanApplicationStatus status,
             String borrowerName,
             Pageable pageable
+    ) throws IException
+    {
+        List<ViewAllLoanApplicationsResponse> loanApplications = loanAppService.viewLoanApplications(status,borrowerName,pageable);
+
+        return ResponseEntity.ok(IResponse.<List<ViewAllLoanApplicationsResponse>>builder()
+                .data(loanApplications)
+                .status(ApiStatus.LOAN_APPLICATION_SUCCESSFUL.name())
+                .message(ApiStatus.LOAN_APPLICATION_SUCCESSFUL.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build());
+    }
+
+
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping(value="/loan-application/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<IResponse<LoanApplicationEntity>> viewUserLoanApplication(
+            Authentication authentication
     ) throws IException
     {
         List<ViewAllLoanApplicationsResponse> loanApplications = loanAppService.viewLoanApplications(status,borrowerName,pageable);

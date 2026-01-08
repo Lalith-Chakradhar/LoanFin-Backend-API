@@ -2,7 +2,9 @@ package loanfin.service.adminServices;
 
 import loanfin.dto.ViewAllLoanApplicationsResponse;
 import loanfin.entity.LoanApplicationEntity;
+import loanfin.entity.UserEntity;
 import loanfin.enums.LoanApplicationStatus;
+import loanfin.exception.IException;
 import loanfin.repository.LoanApplicationRepository;
 import loanfin.util.NameHasher;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import org.springframework.data.domain.Pageable;
+
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -35,6 +39,22 @@ public class LoanAppServiceImpl implements LoanAppService{
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
+    }
+
+    @Override
+    public LoanApplicationEntity viewIndividualLoanApplication(String loanId, UserEntity admin)
+    {
+        LoanApplicationEntity loan = loanApplicationRepository.findById(loanId).orElseThrow();
+
+        if(loan.getStatus() == LoanApplicationStatus.SUBMITTED)
+        {
+            loan.setStatus(LoanApplicationStatus.UNDER_REVIEW);
+            loan.setUnderReviewAt(Instant.now());
+            loan.setReviewedBy(admin);
+            loan.setLastStatusUpdatedAt(Instant.now());
+        }
+
+        return loan;
     }
 
     private ViewAllLoanApplicationsResponse mapToResponse(LoanApplicationEntity entity)
