@@ -11,6 +11,7 @@ import loanfin.enums.LoanApplicationStatus;
 import loanfin.exception.IException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import org.springframework.data.domain.Pageable;
@@ -43,6 +44,7 @@ public interface LoanAppController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     public ResponseEntity<IResponse<LoanApplicationEntity>> viewUserLoanApplication(
+            @PathVariable String id,
             Authentication authentication
     ) throws IException;
 }

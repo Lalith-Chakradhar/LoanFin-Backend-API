@@ -5,6 +5,7 @@ import loanfin.enums.LoanApplicationStatus;
 import lombok.*;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -67,4 +68,27 @@ public class LoanApplicationEntity extends BaseEntity{
 
     @Column(name = "last_status_updated_at", nullable = false)
     private Instant lastStatusUpdatedAt;
+
+    //admin leasing for avoiding review conflict
+    @ManyToOne(fetch = FetchType.LAZY)
+    private UserEntity reviewerLeaseOwner;
+
+    @Column(name = "reviewer_lease_acquired_at")
+    private Instant reviewerLeaseAcquiredAt;
+
+    @Column(name = "reviewer_lease_expires_at")
+    private Instant reviewerLeaseExpiresAt;
+
+    @PrePersist
+    protected void onCreate() {
+        Instant now = Instant.now();
+        this.submittedAt = now;
+        this.lastStatusUpdatedAt = now;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.lastStatusUpdatedAt = Instant.now();
+    }
+
 }

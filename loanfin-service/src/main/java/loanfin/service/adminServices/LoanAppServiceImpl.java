@@ -12,8 +12,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -42,16 +44,26 @@ public class LoanAppServiceImpl implements LoanAppService{
     }
 
     @Override
+    @Transactional
     public LoanApplicationEntity viewIndividualLoanApplication(String loanId, UserEntity admin)
     {
+        Instant now = Instant.now();
+        Instant expiry = now.plus(30, ChronoUnit.MINUTES);
+
+        int locked = loanApplicationRepository.acquireLease(loanId, admin, now, expiry);
+
+        if(locked == 0)
+        {
+            throw new IException("LOAN_ALREADY_UNDER_REVIEW");
+        }
+
         LoanApplicationEntity loan = loanApplicationRepository.findById(loanId).orElseThrow();
 
         if(loan.getStatus() == LoanApplicationStatus.SUBMITTED)
         {
             loan.setStatus(LoanApplicationStatus.UNDER_REVIEW);
-            loan.setUnderReviewAt(Instant.now());
+            loan.setUnderReviewAt(now);
             loan.setReviewedBy(admin);
-            loan.setLastStatusUpdatedAt(Instant.now());
         }
 
         return loan;
