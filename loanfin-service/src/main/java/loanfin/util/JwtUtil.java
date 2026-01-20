@@ -24,7 +24,7 @@ public class JwtUtil {
 
     public String generateToken(UserEntity user){
         return Jwts.builder()
-                .setSubject(user.getId())
+                .setSubject(user.getEmailHash())
                 .claim("role", user.getRole().name())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtConfig.getExpiration()))
@@ -32,13 +32,13 @@ public class JwtUtil {
                 .compact();
     }
 
-    public String extractUserId(String token){
+    public String extractUsername(String token){
         return extractAllClaims(token).getSubject();
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails){
-        String userId = extractUserId(token);
-        return userId.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        String emailHash = extractUsername(token);
+        return emailHash.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {

@@ -7,6 +7,7 @@ import loanfin.entity.LoanApplicationEntity;
 import loanfin.entity.UserEntity;
 import loanfin.enums.LoanApplicationStatus;
 import loanfin.exception.IException;
+import loanfin.security.CustomUserDetails;
 import loanfin.service.adminServices.LoanAppService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,7 +69,10 @@ public class LoanAppControllerImpl implements LoanAppController{
             Authentication authentication
     ) throws IException
     {
-        UserEntity admin = (UserEntity) authentication.getPrincipal();
+        CustomUserDetails principal =
+                (CustomUserDetails) authentication.getPrincipal();
+
+        UserEntity admin = principal.getUser();
 
         LoanApplicationEntity loan =
                 loanAppService.viewIndividualLoanApplication(id, admin);
