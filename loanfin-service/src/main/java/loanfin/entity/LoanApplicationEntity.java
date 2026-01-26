@@ -5,7 +5,6 @@ import loanfin.enums.LoanApplicationStatus;
 import lombok.*;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -57,8 +56,8 @@ public class LoanApplicationEntity extends BaseEntity{
     )
     private UserEntity reviewedBy;
 
-    @Column(name = "remarks", length = 500)
-    private String remarks;
+    @Column(name = "review_remarks", length = 500)
+    private String reviewRemarks;
 
     @Column(name = "submitted_at", nullable = false, updatable = false)
     private Instant submittedAt;
@@ -90,5 +89,48 @@ public class LoanApplicationEntity extends BaseEntity{
     protected void onUpdate() {
         this.lastStatusUpdatedAt = Instant.now();
     }
+
+    public void markUnderReview(UserEntity admin, Instant now, Instant expiry) {
+        validateSubmittedState();
+        this.status = LoanApplicationStatus.UNDER_REVIEW;
+        this.underReviewAt = now;
+        this.reviewerLeaseOwner = admin;
+        this.reviewerLeaseAcquiredAt = now;
+        this.reviewerLeaseExpiresAt = expiry;
+    }
+
+    public void approve(UserEntity admin, String remarks) {
+        validateUnderReviewState(admin);
+        this.status = LoanApplicationStatus.APPROVED;
+        this.reviewedBy = admin;
+        this.reviewRemarks = remarks;
+        this.reviewerLeaseOwner = null;
+        this.reviewerLeaseExpiresAt = null;
+    }
+
+    public void reject(UserEntity admin, String remarks) {
+        validateUnderReviewState(admin);
+        this.status = LoanApplicationStatus.REJECTED;
+        this.reviewedBy = admin;
+        this.reviewRemarks = remarks;
+        this.reviewerLeaseOwner = null;
+        this.reviewerLeaseExpiresAt = null;
+    }
+
+    private void validateSubmittedState() {
+        if (this.status != LoanApplicationStatus.SUBMITTED) {
+            throw new IllegalStateException("Application is not in SUBMITTED state");
+        }
+    }
+
+    private void validateUnderReviewState(UserEntity admin) {
+        if (this.status != LoanApplicationStatus.UNDER_REVIEW) {
+            throw new IllegalStateException("Application is not under review");
+        }
+        if (!admin.equals(this.reviewerLeaseOwner)) {
+            throw new IllegalStateException("Reviewer lease not owned by this admin");
+        }
+    }
+
 
 }

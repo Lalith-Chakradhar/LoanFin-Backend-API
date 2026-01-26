@@ -74,7 +74,7 @@ public class LoanAppControllerImpl implements LoanAppController{
         UserEntity admin = principal.getUser();
 
         LoanApplicationEntity loan =
-                loanAppService.viewIndividualLoanApplication(id, admin);
+                loanAppService.startLoanApplicationReview(id, admin);
 
         return ResponseEntity.ok(
                 IResponse.<LoanApplicationEntity>builder()
@@ -101,12 +101,15 @@ public class LoanAppControllerImpl implements LoanAppController{
 
         UserEntity admin = principal.getUser();
 
-        LoanApplicationReviewResponse loanReview = loanAppService.reviewLoanApplication(id, request, admin);
+        LoanApplicationReviewResponse loanReview = loanAppService.approveOrRejectLoanApplication(id, request, admin);
 
         return ResponseEntity.ok(
                 IResponse.<LoanApplicationReviewResponse>builder()
                         .data(loanReview)
-                        .status(A)
-        )
+                        .status(ApiStatus.LOAN_APPLICATION_REVIEW_SUCCESSFUL.name())
+                        .message(ApiStatus.LOAN_APPLICATION_REVIEW_SUCCESSFUL.getMessage())
+                        .timestamp(LocalDateTime.now())
+                        .build()
+        );
     }
 }

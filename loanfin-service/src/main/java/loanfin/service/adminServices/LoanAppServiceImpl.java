@@ -1,9 +1,13 @@
 package loanfin.service.adminServices;
 
+import loanfin.dto.LoanApplicationReviewRequest;
+import loanfin.dto.LoanApplicationReviewResponse;
+import loanfin.dto.ReviewMetadata;
 import loanfin.dto.ViewAllLoanApplicationsResponse;
 import loanfin.entity.LoanApplicationEntity;
 import loanfin.entity.UserEntity;
 import loanfin.enums.LoanApplicationStatus;
+import loanfin.enums.ReviewDecision;
 import loanfin.exception.IException;
 import loanfin.repository.LoanApplicationRepository;
 import loanfin.util.NameHasher;
@@ -45,7 +49,7 @@ public class LoanAppServiceImpl implements LoanAppService{
 
     @Override
     @Transactional
-    public LoanApplicationEntity viewIndividualLoanApplication(String loanId, UserEntity admin)
+    public LoanApplicationEntity startLoanApplicationReview(String loanId, UserEntity admin)
     {
         Instant now = Instant.now();
         Instant expiry = now.plus(30, ChronoUnit.MINUTES);
@@ -59,14 +63,72 @@ public class LoanAppServiceImpl implements LoanAppService{
 
         LoanApplicationEntity loan = loanApplicationRepository.findById(loanId).orElseThrow();
 
-        if(loan.getStatus() == LoanApplicationStatus.SUBMITTED)
-        {
-            loan.setStatus(LoanApplicationStatus.UNDER_REVIEW);
-            loan.setUnderReviewAt(now);
-            loan.setReviewedBy(admin);
-        }
+        loan.markUnderReview(admin, now, expiry);
 
         return loan;
+    }
+
+    @Override
+    @Transactional
+    public LoanApplicationReviewResponse approveOrRejectLoanApplication(
+            String loanId,
+            LoanApplicationReviewRequest request,
+            UserEntity admin)
+    {
+        //Get loan application details of particular loan application id
+        LoanApplicationEntity loan = loanApplicationRepository
+                .findById(loanId)
+                .orElseThrow(() -> new IException("LOAN_APPLICATION_NOT_FOUND"));
+
+        //Validate application is under review
+        if(loan.getStatus() != LoanApplicationStatus.UNDER_REVIEW)
+        {
+            throw new IException("LOAN_APPLICATION_NOT_UNDER_REVIEW");
+        }
+
+        //Validate reviewer lease ownership
+        if(!admin.equals(loan.getReviewerLeaseOwner())){
+            throw new IException("REVIEWER_LEASE_NOT_OWNED_BY_ADMIN");
+        }
+
+        //Approve or Reject using DOMAIN METHODS
+        if(request.getDecision() == ReviewDecision.APPROVE){
+            loan.approve(admin, request.getRemarks());
+        } else if (request.getDecision() == ReviewDecision.REJECT)
+        {
+            loan.reject(admin, request.getRemarks());
+        }
+        else
+        {
+            throw new IException("INVALID_REVIEW_DECISION");
+        }
+
+        LoanApplicationReviewResponse response = new LoanApplicationReviewResponse();
+        response.setApplicationId(loan.getId());
+        response.setStatus(loan.getStatus());
+        response.setMessage(
+                loan.getStatus() == LoanApplicationStatus.APPROVED
+                ? "Loan application approved successfully"
+                        :"Loan application rejected"
+        );
+
+        ReviewMetadata reviewMetadata = new ReviewMetadata();
+        reviewMetadata.setDecision(request.getDecision());
+        reviewMetadata.setReviewedBy(admin.getId());
+        reviewMetadata.setReviewedAt(loan.getLastStatusUpdatedAt());
+        reviewMetadata.setRemarks(request.getRemarks());
+
+        response.setReview(reviewMetadata);
+
+        //Return loan account on approval
+        if(loan.getStatus() == LoanApplicationStatus.APPROVED)
+        {
+            response.setLoanAccount(
+                    loanAccountMapper.toSummaryDto(loan.getLoanAccount())
+            );
+        }
+
+        return response;
     }
 
     private ViewAllLoanApplicationsResponse mapToResponse(LoanApplicationEntity entity)

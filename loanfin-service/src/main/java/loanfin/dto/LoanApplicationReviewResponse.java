@@ -1,16 +1,14 @@
 package loanfin.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import loanfin.enums.LoanAccountStatus;
 import loanfin.enums.LoanApplicationStatus;
-import loanfin.enums.ReviewDecision;
-import lombok.Builder;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.time.Instant;
+import lombok.NoArgsConstructor;
 
 @Data
-@Builder
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
+@AllArgsConstructor(access = AccessLevel.PUBLIC)
 public class LoanApplicationReviewResponse {
     private String applicationId;
     private LoanApplicationStatus status;
@@ -20,25 +18,4 @@ public class LoanApplicationReviewResponse {
 
     private String message;
 
-    // -------- Nested DTOs --------
-
-    @Data
-    @Builder
-    public static class ReviewMetadata {
-        private ReviewDecision decision;
-        private String reviewedBy;
-        private Instant reviewedAt;
-        private String remarks;
-    }
-
-    @Data
-    @Builder
-    @JsonInclude(JsonInclude.Include.NON_NULL) // for reject cases
-    public static class LoanAccountSummary {
-        private String loanAccountId;
-        private Double principalAmount;
-        private Integer tenureMonths;
-        private Double interestRate;
-        private LoanAccountStatus state;
-    }
 }
