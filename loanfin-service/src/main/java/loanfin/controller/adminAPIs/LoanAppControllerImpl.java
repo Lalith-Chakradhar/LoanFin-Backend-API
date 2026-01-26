@@ -2,6 +2,8 @@ package loanfin.controller.adminAPIs;
 
 import loanfin.constant.ApiStatus;
 import loanfin.dto.IResponse;
+import loanfin.dto.LoanApplicationReviewRequest;
+import loanfin.dto.LoanApplicationReviewResponse;
 import loanfin.dto.ViewAllLoanApplicationsResponse;
 import loanfin.entity.LoanApplicationEntity;
 import loanfin.entity.UserEntity;
@@ -15,10 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Pageable;
 import java.time.LocalDateTime;
@@ -85,5 +84,29 @@ public class LoanAppControllerImpl implements LoanAppController{
                         .timestamp(LocalDateTime.now())
                         .build()
         );
+    }
+
+
+    @Override
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping(value="/loan-application/{id}/review", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<IResponse<LoanApplicationReviewResponse>> reviewUserLoanApplication(
+            @PathVariable String id,
+            LoanApplicationReviewRequest request,
+            Authentication authentication
+    ) throws IException
+    {
+        CustomUserDetails principal =
+                (CustomUserDetails) authentication.getPrincipal();
+
+        UserEntity admin = principal.getUser();
+
+        LoanApplicationReviewResponse loanReview = loanAppService.reviewLoanApplication(id, request, admin);
+
+        return ResponseEntity.ok(
+                IResponse.<LoanApplicationReviewResponse>builder()
+                        .data(loanReview)
+                        .status(A)
+        )
     }
 }

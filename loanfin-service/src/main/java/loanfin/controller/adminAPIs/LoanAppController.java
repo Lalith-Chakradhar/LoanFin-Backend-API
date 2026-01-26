@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import loanfin.dto.IResponse;
+import loanfin.dto.LoanApplicationReviewRequest;
+import loanfin.dto.LoanApplicationReviewResponse;
 import loanfin.dto.ViewAllLoanApplicationsResponse;
 import loanfin.entity.LoanApplicationEntity;
 import loanfin.enums.LoanApplicationStatus;
@@ -45,6 +47,23 @@ public interface LoanAppController {
     })
     public ResponseEntity<IResponse<LoanApplicationEntity>> viewUserLoanApplication(
             @PathVariable String id,
+            Authentication authentication
+    ) throws IException;
+
+
+    @Operation(
+            summary = "Mark individual loan application - approved or rejected",
+            description = "Approve or reject an individual loan application"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Loan application approved or rejected successfully"),
+            @ApiResponse(responseCode = "409", description = "Loan application is already APPROVED and cannot be reviewed again"),
+            @ApiResponse(responseCode = "403", description = "Only admins are allowed to review loan applications"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    public ResponseEntity<IResponse<LoanApplicationReviewResponse>> reviewUserLoanApplication(
+            @PathVariable String id,
+            LoanApplicationReviewRequest request,
             Authentication authentication
     ) throws IException;
 }
