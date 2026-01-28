@@ -9,6 +9,7 @@ import loanfin.entity.UserEntity;
 import loanfin.enums.LoanApplicationStatus;
 import loanfin.enums.ReviewDecision;
 import loanfin.exception.IException;
+import loanfin.mapper.LoanAccountMapper;
 import loanfin.repository.LoanApplicationRepository;
 import loanfin.util.NameHasher;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ import java.util.List;
 public class LoanAppServiceImpl implements LoanAppService{
 
     private final LoanApplicationRepository loanApplicationRepository;
+    private final LoanAccountMapper loanAccountMapper;
 
     @Override
     public List<ViewAllLoanApplicationsResponse> viewLoanApplications(LoanApplicationStatus status, String borrowerName, Pageable pageable)
@@ -124,7 +126,7 @@ public class LoanAppServiceImpl implements LoanAppService{
         if(loan.getStatus() == LoanApplicationStatus.APPROVED)
         {
             response.setLoanAccount(
-                    loanAccountMapper.toSummaryDto(loan.getLoanAccount())
+                    loanAccountMapper.mapToLoanAccountSummaryDto(loan.getLoanAccount())
             );
         }
 

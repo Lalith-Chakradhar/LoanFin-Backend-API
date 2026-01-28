@@ -78,6 +78,9 @@ public class LoanApplicationEntity extends BaseEntity{
     @Column(name = "reviewer_lease_expires_at")
     private Instant reviewerLeaseExpiresAt;
 
+    @OneToOne(mappedBy = "loanApplication", fetch = FetchType.LAZY)
+    private LoanEntity loan;
+
     @PrePersist
     protected void onCreate() {
         Instant now = Instant.now();
