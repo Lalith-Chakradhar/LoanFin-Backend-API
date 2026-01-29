@@ -11,6 +11,7 @@ import loanfin.enums.ReviewDecision;
 import loanfin.exception.IException;
 import loanfin.mapper.LoanAccountMapper;
 import loanfin.repository.LoanApplicationRepository;
+import loanfin.service.LoanAccountNumberGenerator;
 import loanfin.util.NameHasher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,6 +30,8 @@ public class LoanAppServiceImpl implements LoanAppService{
 
     private final LoanApplicationRepository loanApplicationRepository;
     private final LoanAccountMapper loanAccountMapper;
+    private final LoanRepository loanRepository;
+    private final LoanAccountNumberGenerator loanAccountNumberGenerator;
 
     @Override
     public List<ViewAllLoanApplicationsResponse> viewLoanApplications(LoanApplicationStatus status, String borrowerName, Pageable pageable)
